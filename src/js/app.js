@@ -37,7 +37,7 @@ export let timer = counter();
 
 export let count = derived(timer,$timer=>{
     if($timer!==0){
-        console.log($timer)
+        
     }
     return $timer===0;
 })
