@@ -13,7 +13,7 @@ export class catApi{
      */
     async categorys(options){
         if(!options)options = {}
-        let url = Object.keys(options).map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&')
+        let url = Object.keys(options).map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(options[k])).join('&')
         return await fetch(`${this.url}/categories?${url}`,this.options)
         .then(e=>e.json())
     }
@@ -26,7 +26,7 @@ export class catApi{
      */
     async breeds(options){
         if(!options)options = {}
-        let url = Object.keys(options).map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&')
+        let url = Object.keys(options).map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(options[k])).join('&')
         return await fetch(`${this.url}/breeds?${url}`,this.options)
         .then(e=>e.json())
     }
@@ -44,7 +44,7 @@ export class catApi{
      */
     async images(options){
         if(!options)options = {}
-        let url = Object.keys(options).map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&')
+        let url = Object.keys(options).map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(options[k])).join('&')
         return await fetch(`${this.url}/images/search?${url}`,this.options)
         .then(e=>e.json())
     }
