@@ -28,16 +28,16 @@ export let CatBg = derived(imageData,$imageBg=>$imageBg.map(e=>e.url));
 
 export let CatBreed = derived(imageData,$imageBg=>$imageBg.map(e=>e.breeds))
 
-const counter = ()=>{
-    let {subscribe,update,set} = writable(0)
-    return {subscribe,count:(n)=>set(n)}
-}
+// const counter = ()=>{
+//     let {subscribe,update,set} = writable(0)
+//     return {subscribe,count:(n)=>set(n)}
+// }
 
-export let timer = counter();
+// export let timer = counter();
 
-export let count = derived(timer,$timer=>{
-    if($timer!==0){
+// export let count = derived(timer,$timer=>{
+//     if($timer!==0){
         
-    }
-    return $timer===0;
-})
+//     }
+//     return $timer===0;
+// })
