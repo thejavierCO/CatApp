@@ -1,17 +1,28 @@
 <script>
-  //   import { CatBg } from "../js/app";
+  import { onMount } from "svelte";
   export let useImage;
   export let useColor;
-  let use = undefined;
-  if (useImage && !useColor) use = useImage;
-  else if (!useImage && useColor) use = useColor;
-  else if (!useImage && !useColor) throw "not defined type content background";
+  if (useImage && !useColor) {
+    onMount(() => {
+      useImage.subscribe((e) => {
+        let [image] = e;
+        document.querySelector(
+          "div.bg"
+        ).style.backgroundImage = `url(${image})`;
+      });
+    });
+  } else if (!useImage && useColor) {
+    onMount(() => {
+      console.log(document.querySelector("div.bg"));
+    });
+  } else if (!useImage && !useColor)
+    throw "not defined type content background";
 </script>
 
 <slot />
-<!-- <div class="bg" style="background-image: url('{$CatBg}')" /> -->
+<div class="bg" />
 
-<!-- <style>
+<style>
   div.bg {
     position: fixed;
     top: 0;
@@ -24,4 +35,4 @@
     background-size: cover;
     z-index: -1;
   }
-</style> -->
+</style>

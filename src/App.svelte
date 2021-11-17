@@ -3,4 +3,4 @@
   import Background from "./Components/bg.svelte";
 </script>
 
-<Background />
+<Background useImage={CatBg} />
