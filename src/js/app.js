@@ -6,7 +6,9 @@ let api = new catApi();
 
 let backgroundCat = ()=>{
     const get = async (set)=>{
-        let data = await api.images();
+        let data = await api.images({
+            format:"jpg"
+        });
         localStorage.setItem("todayCat",JSON.stringify(data))
         localStorage.setItem("expire",JSON.stringify(dayjs().add(1,"day").day()))
         set(data);
@@ -27,17 +29,3 @@ export let imageData = backgroundCat();
 export let CatBg = derived(imageData,$imageBg=>$imageBg.map(e=>e.url));
 
 export let CatBreed = derived(imageData,$imageBg=>$imageBg.map(e=>e.breeds))
-
-const counter = ()=>{
-    let {subscribe,update,set} = writable(0)
-    return {subscribe,count:(n)=>set(n)}
-}
-
-export let timer = counter();
-
-export let count = derived(timer,$timer=>{
-    if($timer!==0){
-        
-    }
-    return $timer===0;
-})
