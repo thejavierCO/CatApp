@@ -1,10 +1,10 @@
 import App from './App.svelte';
-import { catApi } from './js/catapi';
+import { CatApi } from './js/catApi';
 
 const app = new App({
 	target: document.body,
 	props: {
-		api:new catApi()
+		api:new CatApi("60213ae1-2505-46e8-8843-e72cc3b30468")
 	}
 });
 

@@ -1,8 +1,16 @@
 <script>
-  import Bg from "./Components/bg.svelte";
+  export let api;
+  api
+    .images()
+    .search({
+      format: "json",
+    })
+    .then((e) => {
+      console.log(e);
+    });
 </script>
 
-<Bg let:img>
+<!-- <Bg let:img>
   <div class="container overflow-auto vh-full mx-auto grid items-center">
     <div
       class="bg-black text-white border-radius grid items-center justify-self-center p-2"
@@ -13,14 +21,4 @@
       >
     </div>
   </div>
-</Bg>
-
-<style global>
-  .vh-full {
-    height: 100vh;
-    width: 100vw;
-  }
-  .border-radius {
-    border-radius: 1%;
-  }
-</style>
+</Bg> -->
