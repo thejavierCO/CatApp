@@ -2,9 +2,7 @@
   export let imageUrl;
 </script>
 
-<div class="container overflow-auto vh-full mx-auto grid items-center">
-  <slot img={imageUrl} />
-</div>
+<slot img={imageUrl} />
 <div style="background-image: url('{imageUrl}')" bg />
 
 <style>
