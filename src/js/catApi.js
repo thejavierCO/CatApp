@@ -42,12 +42,8 @@ export class CatApi{
     }
     if(typeof token === "string")this._options["headers"]["x-api-key"] = token;
   }
-  call(path,method,options,http_options){
+  call(path,method,options){
     if(!options)options = {}
-    console.log({
-      ...this._options,
-      ...http_options||""
-    })
     let url = Object
       .keys(options)
       .map(k=>encodeURIComponent(k) + '=' + encodeURIComponent(options[k]))
