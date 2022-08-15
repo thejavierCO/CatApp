@@ -5,7 +5,7 @@ const app = new App({
 	props:{
 		config:{
 			size:"med",
-			mime_types:"gif"
+			mime_types:"jpg"
 		}
 	}
 });
