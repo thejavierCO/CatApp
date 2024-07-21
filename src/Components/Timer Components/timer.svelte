@@ -1,5 +1,4 @@
 <script>
-
   import { createEventDispatcher, onMount } from "svelte";
   import Counter from "./countInterval.svelte";
   import { TimeView } from "../../js/data";
@@ -19,7 +18,7 @@
   on:current_status_timer={({ detail }) => {
     if (status != detail.status) emit("state", detail);
   }}
-  {status}
+  bind:status
   {seconds}
   {time}
   let:current_time

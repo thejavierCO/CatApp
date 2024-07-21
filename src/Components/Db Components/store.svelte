@@ -70,7 +70,7 @@
   }
 </script>
 
-<slot {add} {del} {edit} />
+<slot {add} {del} {edit} {store} />
 
 <LayoutGrid>
   {#each $store as data, index}

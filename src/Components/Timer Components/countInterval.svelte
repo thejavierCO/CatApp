@@ -3,7 +3,7 @@
 
   import { createEventDispatcher, onDestroy } from "svelte";
 
-  export let Time = { start: 0, pause: 0, end: 0 };
+  export let time = { start: 0, pause: 0, end: 0 };
   export let status = "Stop";
   export let seconds = 1;
 
