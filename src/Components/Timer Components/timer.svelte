@@ -1,15 +1,14 @@
-<script lang="ts">
-  import type { ITime, IStatus } from "../../types";
+<script>
 
   import { createEventDispatcher, onMount } from "svelte";
   import Counter from "./countInterval.svelte";
   import { TimeView } from "../../js/data";
   let emit = createEventDispatcher();
 
-  export let seconds: number = 1;
-  export let time: ITime = { start: 0, pause: 0, end: 0 };
+  export let seconds = 1;
+  export let time = { start: 0, pause: 0, end: 0 };
   export let autoRun = false;
-  export let status: IStatus = "Stop";
+  export let status = "Stop";
 
   onMount(() => {
     if (autoRun) status = "Play";

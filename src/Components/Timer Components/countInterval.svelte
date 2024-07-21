@@ -1,19 +1,17 @@
-<script lang="ts">
-  import type { ITime, IStatus, IActions, IMillis } from "../../types";
-  import type { Readable, Unsubscriber } from "svelte/store";
+<script>
   import { ConutTime } from "../../js/data";
 
   import { createEventDispatcher, onDestroy } from "svelte";
 
-  export let time: ITime = { start: 0, pause: 0, end: 0 };
-  export let status: IStatus = "Stop";
+  export let Time = { start: 0, pause: 0, end: 0 };
+  export let status = "Stop";
   export let seconds = 1;
 
-  let millis: IMillis = seconds * 1000;
+  let millis = seconds * 1000;
   let emit = createEventDispatcher();
-  let posicion: Readable<number> = new ConutTime().Time;
+  let posicion = new ConutTime().Time;
   let current_time = 0;
-  let control: IActions = {
+  let control = {
     play: (data) => {
       status = "Play";
       if (data) {
@@ -51,7 +49,7 @@
     },
   };
 
-  let unsus: Unsubscriber = posicion.subscribe((data) => {
+  let unsus = posicion.subscribe((data) => {
     if (status == "Play") control.play(data);
     else if (status == "Pause") control.pause(data);
     else if (status == "Stop") control.stop(true);
