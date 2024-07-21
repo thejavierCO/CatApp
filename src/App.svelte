@@ -1,6 +1,7 @@
 <script>
-  import { CatBg } from "./js/app";
-  import Background from "./Components/bg.svelte";
+  import Store from "./Components/Db Components/store.svelte"
+  // import { CatBg } from "./js/app";
+  // import Background from "./Components/bg.svelte";
 </script>
 
-<Background useImage={CatBg} />
+<!-- <Background useImage={CatBg} /> -->
