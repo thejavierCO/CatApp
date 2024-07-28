@@ -1,12 +1,12 @@
 <script>
   import { ConutTime } from "../../js/data";
 
-  import { createEventDispatcher, onDestroy } from "svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
 
   export let time = { start: 0, pause: 0, end: 0 };
   export let status = "Stop";
   export let seconds = 1;
-
+  export let autoRun = false;
   let millis = seconds * 1000;
   let emit = createEventDispatcher();
   let posicion = new ConutTime().Time;
@@ -56,6 +56,7 @@
   });
 
   onDestroy(() => unsus());
+  if (autoRun) control.play();
 </script>
 
 <slot actions={control} {current_time} />

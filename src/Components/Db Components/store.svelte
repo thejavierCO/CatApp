@@ -1,6 +1,6 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-  import { writable } from "svelte/store";
+  import { createEventDispatcher, onMount } from "svelte";
+  import { writable, get } from "svelte/store";
   import LayoutGrid, { Cell } from "@smui/layout-grid";
   import { v4 as uuidv4 } from "uuid";
   export let useLocalStorage = false;
@@ -68,6 +68,8 @@
       return db;
     });
   }
+
+  onMount(() => emit("mount", { add, del, edit, store: () => get(store) }));
 </script>
 
 <slot {add} {del} {edit} {store} />
