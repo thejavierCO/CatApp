@@ -69,7 +69,7 @@
     });
   }
 
-  onMount(() => emit("mount", { add, del, edit, store: () => get(store) }));
+  onMount(() => emit("mount", { add, del, edit, store }));
 </script>
 
 <slot {add} {del} {edit} {store} />
