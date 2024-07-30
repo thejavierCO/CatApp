@@ -16,7 +16,7 @@
       catImage.subscribe(async (data) => {
         add({
           status: "Stop",
-          seconds: 10,
+          seconds: 86400,
           time: { start: 0, end: 0, pause: 0 },
           img: await data,
         });
@@ -46,7 +46,7 @@
                 alt="cat"
               />
               <span class="sm:text-sm md:text-2xl text-center text-white">
-                New Cat \(♥‿♥)/
+                #{index + 1} Cat \(♥‿♥)/
               </span>
               <span class="text-center text-white">Delete in</span>
               <span class="sm:text-sm md:text-2xl text-center text-white">
