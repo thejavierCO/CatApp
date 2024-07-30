@@ -10,6 +10,7 @@
 <Store
   let:edit
   let:del
+  let:store
   useLocalStorage
   on:mount={async ({ detail: { add, store } }) => {
     if (store().length === 0) {
@@ -24,7 +25,41 @@
     } else console.log("first");
   }}
 >
-  <div slot="print" let:id let:data let:index>
+  {#each store as { status, time, seconds, id, img }}
+    <Counter
+      autoRun
+      {seconds}
+      {status}
+      {time}
+      let:formatTime
+      on:state={({ detail }) => {
+        if (detail.status == "Stop") del(id);
+        edit(id, detail);
+      }}
+    >
+      <div>
+        <Background imageUrl={img} let:img>
+          <div class="flex justify-center">
+            <div class="rounded-lg shadow-lg bg-black max-w-sm grid">
+              <img
+                class="rounded-t-lg max-w-full h-auto items-center"
+                src={img}
+                alt="cat"
+              />
+              <span class="sm:text-sm md:text-2xl text-center text-white">
+                New Cat \(♥‿♥)/
+              </span>
+              <span class="text-center text-white">Delete in</span>
+              <span class="sm:text-sm md:text-2xl text-center text-white">
+                {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
+              </span>
+            </div>
+          </div>
+        </Background>
+      </div>
+    </Counter>
+  {/each}
+  <!-- <div slot="print" let:id let:data let:index>
     <Counter
       autoRun
       seconds={data.seconds}
@@ -57,5 +92,5 @@
         </Background>
       </div>
     </Counter>
-  </div>
+  </div> -->
 </Store>
