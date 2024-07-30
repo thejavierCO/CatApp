@@ -19,12 +19,12 @@
 
   onMount(() => {
     if (autoRun) {
-      // status = "Play";
-      return Counter.play();
+      if (status != "Play") return Counter.play();
+      if (status == "Stop") return Counter.stop();
     }
   });
 
-  onDestroy(() => console.log(Counter.Destroy(), "unsus"));
+  onDestroy(() => Counter.Destroy());
 </script>
 
 <slot

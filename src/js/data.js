@@ -1,7 +1,7 @@
 import { writable, readable } from "svelte/store";
 
 export class ConutTime extends EventTarget {
-  constructor() {
+  constructor(callbackUnSuscribe = () => this.emit("UnSuscribe", this)) {
     super();
     this._posicion = readable(0, (set) => {
       function updateClock(_) {
@@ -9,17 +9,24 @@ export class ConutTime extends EventTarget {
         window.requestAnimationFrame(updateClock);
       }
       window.requestAnimationFrame(updateClock);
-      return _ => console.warn("unsus");
+      return _ => callbackUnSuscribe()
     })
   }
   get Time() {
     return this._posicion
   }
+  emit(name, data) {
+    if (data) return this.dispatchEvent(new CustomEvent(name, { detail: data }))
+    else return this.dispatchEvent(new Event(name))
+  }
+  on(name, callback) {
+    this.addEventListener(name, callback)
+  }
 }
 
 export class TimeView {
-  constructor(current_time) {
-    this._current_time = current_time;
+  constructor(TimeMillis) {
+    this._current_time = TimeMillis;
   }
   current() {
     return this._current_time
@@ -47,7 +54,9 @@ export class TimeView {
 
 export class Temporizador extends ConutTime {
   constructor(TimeMillis, time, status) {
-    super();
+    super(_ => {
+      console.log(this)
+    });
     this.status = status || "Stop";
     this.time = time || { start: 0, pause: 0, end: 0 };
     this.timeTotal = TimeMillis;
@@ -56,7 +65,6 @@ export class Temporizador extends ConutTime {
       if (this.status == "Play") this.play(data);
       else if (this.status == "Pause") this.pause(data);
       else if (this.status == "Stop") this.stop(true);
-      return { time: this.time, status: this.status }
     })
   }
   get current_time() {
@@ -99,13 +107,6 @@ export class Temporizador extends ConutTime {
     this.time.pause = 0;
     this.time.end = 0;
     this.current_time = 0;
-  }
-  emit(name, data) {
-    if (data) return this.dispatchEvent(new CustomEvent(name, { detail: data }))
-    else return this.dispatchEvent(new Event(name))
-  }
-  on(name, callback) {
-    this.addEventListener(name, callback)
   }
   get formatTime() {
     return new TimeView(this.current_time)

@@ -59,11 +59,11 @@
     let name = typeof useLocalStorage == "string" ? useLocalStorage : "store";
     if (localStorage.getItem(name) == null) localStorage.setItem(name, "[]");
     else store.update((_) => JSON.parse(localStorage.getItem(name)));
-    let unsus = store.subscribe((data) => {
-      let oldData = localStorage.getItem(name);
-      if (JSON.stringify(data) != oldData)
-        return localStorage.setItem(name, JSON.stringify(data));
-    });
+    let unsus = store.subscribe((data) =>
+      JSON.stringify(data) != localStorage.getItem(name)
+        ? localStorage.setItem(name, JSON.stringify(data))
+        : ""
+    );
     window.addEventListener("storage", ({ key, newValue }) => {
       if (key == name) {
         store.update((_) => JSON.parse(newValue));
@@ -78,10 +78,12 @@
 <slot {add} {del} {edit} store={$store} />
 
 <LayoutGrid>
-  {#each $store as data, index}
-    <Cell>
-      <slot name="print" id={data.id} {index} {data} />
-    </Cell>
-  {/each}
+  {#if $$slots.print}
+    {#each $store as data, index}
+      <Cell>
+        <slot name="print" id={data.id} {index} {data} />
+      </Cell>
+    {/each}
+  {/if}
   <slot name="input" />
 </LayoutGrid>

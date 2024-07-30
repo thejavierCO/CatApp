@@ -10,14 +10,13 @@
 <Store
   let:edit
   let:del
-  let:store
   useLocalStorage
   on:mount={async ({ detail: { add, store } }) => {
     if (store().length === 0) {
       catImage.subscribe(async (data) => {
         add({
           status: "Stop",
-          seconds: 86400,
+          seconds: 10,
           time: { start: 0, end: 0, pause: 0 },
           img: await data,
         });
@@ -25,21 +24,20 @@
     } else console.log("first");
   }}
 >
-  {#each store as { status, time, seconds, id, img }}
+  <div slot="print" let:id let:data let:index>
     <Counter
       autoRun
-      {seconds}
-      {status}
-      {time}
-      let:status
+      seconds={data.seconds}
+      status={data.status}
+      time={data.time}
       let:formatTime
       on:state={({ detail }) => {
-        edit(id, detail);
         if (detail.status == "Stop") del(id);
+        edit(id, detail);
       }}
     >
       <div>
-        <Background imageUrl={img} let:img>
+        <Background imageUrl={data.img} let:img>
           <div class="flex justify-center">
             <div class="rounded-lg shadow-lg bg-black max-w-sm grid">
               <img
@@ -47,9 +45,9 @@
                 src={img}
                 alt="cat"
               />
-              <span class="sm:text-sm md:text-2xl text-center text-white"
-                >New Cat \(♥‿♥)/</span
-              >
+              <span class="sm:text-sm md:text-2xl text-center text-white">
+                New Cat \(♥‿♥)/
+              </span>
               <span class="text-center text-white">Delete in</span>
               <span class="sm:text-sm md:text-2xl text-center text-white">
                 {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
@@ -59,5 +57,5 @@
         </Background>
       </div>
     </Counter>
-  {/each}
+  </div>
 </Store>
