@@ -19,7 +19,7 @@
 
   onMount(() => {
     if (autoRun) {
-      status = "Play";
+      // status = "Play";
       return Counter.play();
     }
   });

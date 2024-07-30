@@ -17,7 +17,7 @@
       catImage.subscribe(async (data) => {
         add({
           status: "Stop",
-          seconds: 2,
+          seconds: 86400,
           time: { start: 0, end: 0, pause: 0 },
           img: await data,
         });
@@ -47,12 +47,13 @@
                 src={img}
                 alt="cat"
               />
-              <h1 class="text-white">
-                Delete in {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
-              </h1>
-              <h1 class="text-white">
-                Status: {status}
-              </h1>
+              <span class="sm:text-sm md:text-2xl text-center text-white"
+                >New Cat \(♥‿♥)/</span
+              >
+              <span class="text-center text-white">Delete in</span>
+              <span class="sm:text-sm md:text-2xl text-center text-white">
+                {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
+              </span>
             </div>
           </div>
         </Background>
