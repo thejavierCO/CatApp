@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { writable, get } from "svelte/store";
   import LayoutGrid, { Cell } from "@smui/layout-grid";
   import { v4 as uuidv4 } from "uuid";
@@ -7,20 +7,6 @@
 
   const emit = createEventDispatcher();
   const store = writable([]);
-
-  if (useLocalStorage) {
-    let name = typeof useLocalStorage == "string" ? useLocalStorage : "store";
-    if (localStorage.getItem(name) == null) localStorage.setItem(name, "[]");
-    else store.update((_) => JSON.parse(localStorage.getItem(name)));
-    store.subscribe((data) => {
-      let oldData = localStorage.getItem(name);
-      if (JSON.stringify(data) != oldData)
-        localStorage.setItem(name, JSON.stringify(data));
-    });
-    window.addEventListener("storage", ({ key, newValue }) =>
-      key == name ? store.update((_) => JSON.parse(newValue)) : ""
-    );
-  }
 
   export function add(data) {
     let { id } = data;
@@ -69,10 +55,27 @@
     });
   }
 
-  onMount(() => emit("mount", { add, del, edit, store }));
+  if (useLocalStorage) {
+    let name = typeof useLocalStorage == "string" ? useLocalStorage : "store";
+    if (localStorage.getItem(name) == null) localStorage.setItem(name, "[]");
+    else store.update((_) => JSON.parse(localStorage.getItem(name)));
+    let unsus = store.subscribe((data) => {
+      let oldData = localStorage.getItem(name);
+      if (JSON.stringify(data) != oldData)
+        return localStorage.setItem(name, JSON.stringify(data));
+    });
+    window.addEventListener("storage", ({ key, newValue }) => {
+      if (key == name) {
+        store.update((_) => JSON.parse(newValue));
+        emit("storage", JSON.parse(newValue));
+      }
+    });
+    onDestroy(() => unsus());
+  }
+  onMount(() => emit("mount", { add, del, edit, store: () => get(store) }));
 </script>
 
-<slot {add} {del} {edit} {store} />
+<slot {add} {del} {edit} store={$store} />
 
 <LayoutGrid>
   {#each $store as data, index}

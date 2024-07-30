@@ -1,17 +1,12 @@
 <script>
-  import {
-    createEventDispatcher,
-    onMount,
-    beforeUpdate,
-    onDestroy,
-  } from "svelte";
+  import { createEventDispatcher, onMount, onDestroy } from "svelte";
   import { Temporizador } from "../../js/data";
   let emit = createEventDispatcher();
 
-  export let seconds = 1;
   export let time = { start: 0, pause: 0, end: 0 };
-  export let autoRun = false;
   export let status = "Stop";
+  export let seconds = 1;
+  export let autoRun = false;
 
   let Counter = new Temporizador(seconds * 1000, time, status);
 
@@ -21,9 +16,14 @@
     if (status != detail.status) emit("state", detail);
     if (status == "Play") posicion = Counter.formatTime;
   });
+
   onMount(() => {
-    if (autoRun) Counter.play();
+    if (autoRun) {
+      status = "Play";
+      return Counter.play();
+    }
   });
+
   onDestroy(() => console.log(Counter.Destroy(), "unsus"));
 </script>
 

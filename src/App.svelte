@@ -4,41 +4,38 @@
   import Counter from "./Components/Timer Components/timer.svelte";
   import { configApi, catImage } from "./js/store";
   export let config;
-  let store = [];
   configApi.set(config || {});
 </script>
 
 <Store
   let:edit
   let:del
+  let:store
   useLocalStorage
-  on:mount={async ({ detail: { add, store: db } }) => {
-    db.subscribe((data) => {
-      if (data.length === 0) {
-        catImage.subscribe(async (data) => {
-          add({
-            status: "Stop",
-            seconds: 2,
-            time: { start: 0, end: 0, pause: 0 },
-            img: await data,
-          });
+  on:mount={async ({ detail: { add, store } }) => {
+    if (store().length === 0) {
+      catImage.subscribe(async (data) => {
+        add({
+          status: "Stop",
+          seconds: 2,
+          time: { start: 0, end: 0, pause: 0 },
+          img: await data,
         });
-      } else {
-        store = data;
-      }
-    });
+      });
+    } else console.log("first");
   }}
 >
-  {#each store as { id, seconds, status, time, img }}
+  {#each store as { status, time, seconds, id, img }}
     <Counter
       autoRun
       {seconds}
-      bind:status
-      bind:time
+      {status}
+      {time}
       let:status
       let:formatTime
       on:state={({ detail }) => {
         edit(id, detail);
+        if (detail.status == "Stop") del(id);
       }}
     >
       <div>
