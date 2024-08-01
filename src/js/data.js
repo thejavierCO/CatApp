@@ -54,9 +54,7 @@ export class TimeView {
 
 export class Temporizador extends ConutTime {
   constructor(TimeMillis, time, status) {
-    super(_ => {
-      console.log(this)
-    });
+    super();
     this.status = status || "Stop";
     this.time = time || { start: 0, pause: 0, end: 0 };
     this.timeTotal = TimeMillis;
