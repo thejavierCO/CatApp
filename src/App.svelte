@@ -2,26 +2,26 @@
   import Background from "./Components/background.svelte";
   import Store from "./Components/Db Components/store.svelte";
   import Counter from "./Components/Timer Components/timer.svelte";
-  import { configApi, catImage } from "./js/store";
+  import { catImage } from "./js/store";
   export let config;
-  configApi.set(config || {});
 </script>
 
 <Store
+  let:add
   let:edit
   let:del
   useLocalStorage
   on:mount={async ({ detail: { add, store } }) => {
     if (store().length === 0) {
-      catImage.subscribe(async (data) => {
+      catImage(config).then((url) => {
         add({
           status: "Stop",
-          seconds: 86400,
+          seconds: 25, //86400,
           time: { start: 0, end: 0, pause: 0 },
-          img: await data,
+          img: url,
         });
       });
-    } else console.log("first");
+    }
   }}
 >
   <div slot="print" let:id let:data let:index>
@@ -31,9 +31,18 @@
       status={data.status}
       time={data.time}
       let:formatTime
-      on:state={({ detail }) => {
-        if (detail.status == "Stop") del(id);
-        edit(id, detail);
+      on:state={async ({ detail: { data, Counter } }) => {
+        edit(id, data);
+        console.log(Counter);
+        // catImage(config).then((url) => {
+        //   add({
+        //     status: "Stop",
+        //     seconds: 10, //86400,
+        //     time: { start: 0, end: 0, pause: 0 },
+        //     img: url,
+        //   });
+        // });
+        if (data.status == "Stop") del(id);
       }}
     >
       <div>

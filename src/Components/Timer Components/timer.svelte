@@ -13,7 +13,9 @@
   let posicion = Counter.formatTime;
 
   Counter.on("current_status_timer", ({ detail }) => {
-    if (status != detail.status) emit("state", detail);
+    if (status != detail.status) {
+      emit("state", { data: detail, Counter });
+    }
     if (status == "Play") posicion = Counter.formatTime;
   });
 
