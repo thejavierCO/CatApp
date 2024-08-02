@@ -16,7 +16,7 @@
       catImage(config).then((url) => {
         add({
           status: "Stop",
-          seconds: 25, //86400,
+          seconds: 86400,
           time: { start: 0, end: 0, pause: 0 },
           img: url,
         });
@@ -31,18 +31,20 @@
       status={data.status}
       time={data.time}
       let:formatTime
-      on:state={async ({ detail: { data, Counter } }) => {
+      on:state={async ({ detail: { data } }) => {
         edit(id, data);
-        console.log(Counter);
-        // catImage(config).then((url) => {
-        //   add({
-        //     status: "Stop",
-        //     seconds: 10, //86400,
-        //     time: { start: 0, end: 0, pause: 0 },
-        //     img: url,
-        //   });
-        // });
-        if (data.status == "Stop") del(id);
+        if (data.status == "Stop")
+          catImage(config).then((url) => {
+            del(id);
+            setTimeout(() => {
+              add({
+                status: "Stop",
+                seconds: 86400,
+                time: { start: 0, end: 0, pause: 0 },
+                img: url,
+              });
+            }, 100);
+          });
       }}
     >
       <div>
