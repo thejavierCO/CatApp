@@ -1,4 +1,5 @@
 <script>
+  import { blur } from "svelte/transition";
   import Background from "./Components/background.svelte";
   import Store from "./Components/Db Components/store.svelte";
   import Counter from "./Components/Timer Components/timer.svelte";
@@ -13,43 +14,46 @@
   useLocalStorage
   on:mount={async ({ detail: { add, store } }) => {
     if (store().length === 0) {
-      catImage(config).then((url) => {
-        add({
-          status: "Stop",
-          seconds: 86400,
-          time: { start: 0, end: 0, pause: 0 },
-          img: url,
-        });
+      let url = await catImage(config);
+      add({
+        status: "Stop",
+        seconds: 86400,
+        time: { start: 0, end: 0, pause: 0 },
+        img: url,
+        isActiveAutoRun: true,
       });
     }
   }}
 >
   <div slot="print" let:id let:data let:index>
     <Counter
-      autoRun
+      autoRun={data.isActiveAutoRun}
       seconds={data.seconds}
       status={data.status}
       time={data.time}
       let:formatTime
-      on:state={async ({ detail: { data } }) => {
-        edit(id, data);
-        if (data.status == "Stop")
-          catImage(config).then((url) => {
-            del(id);
-            setTimeout(() => {
-              add({
-                status: "Stop",
-                seconds: 86400,
-                time: { start: 0, end: 0, pause: 0 },
-                img: url,
-              });
-            }, 100);
+      on:state={({ detail: { data } }) => edit(id, data)}
+      on:isStop={() => del(id)}
+      on:isStop={async () => {
+        let url = await catImage(config);
+        setTimeout(() => {
+          add({
+            status: "Stop",
+            seconds: 86400,
+            time: { start: 0, end: 0, pause: 0 },
+            img: url,
+            isActiveAutoRun: true,
           });
+        }, 50);
       }}
     >
       <div>
         <Background imageUrl={data.img} let:img>
-          <div class="flex justify-center">
+          <div
+            in:blur={{ duration: 1000 }}
+            out:blur={{ duration: 250 }}
+            class="flex justify-center"
+          >
             <div class="rounded-lg shadow-lg bg-black max-w-sm grid">
               <img
                 class="rounded-t-lg max-w-full h-auto items-center"

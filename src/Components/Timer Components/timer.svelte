@@ -11,10 +11,13 @@
   let Counter = new Temporizador(seconds * 1000, time, status);
 
   let posicion = Counter.formatTime;
-
   Counter.on("current_status_timer", ({ detail }) => {
     if (status != detail.status) {
-      emit("state", { data: detail, Counter });
+      emit("state", { data: detail });
+      if (detail.status == "Stop") emit("isStop");
+      if (detail.status == "Play") emit("isPlay");
+      if (detail.status == "Pause") emit("isPause");
+      status = detail.status;
     }
     if (status == "Play") posicion = Counter.formatTime;
   });
