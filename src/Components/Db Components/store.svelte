@@ -11,7 +11,7 @@
   export function add(data) {
     let { id } = data;
     if (!id) data.id = uuidv4();
-    emit("add", data);
+    emit("addItem", data);
     store.update((e) => {
       if (e.filter((e) => e.id == id).length == 0) e.push(data);
       else emit("error", "exist element");
@@ -19,7 +19,7 @@
     });
   }
   export function del(id) {
-    emit("del", { id });
+    emit("delItem", { id });
     store.update((e) => {
       let item = e.filter((e) => e.id == id);
       if (item.length == 1) return e.filter((e) => e.id != id);
@@ -36,7 +36,7 @@
             ? ((e) => {
                 Object.keys(data).forEach((k) => {
                   if (e[k] != data[k]) {
-                    emit("edit", {
+                    emit("editItem", {
                       id,
                       data: {
                         newData: data,
@@ -65,10 +65,7 @@
         : ""
     );
     window.addEventListener("storage", ({ key, newValue }) => {
-      if (key == name) {
-        store.update((_) => JSON.parse(newValue));
-        emit("storage", JSON.parse(newValue));
-      }
+      if (key == name) store.update((_) => JSON.parse(newValue));
     });
     onDestroy(() => unsus());
   }
