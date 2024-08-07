@@ -13,7 +13,6 @@ export class dbStore extends EventTarget {
   constructor(fnsDefaultStore) {
     super();
     this.store = writable([], fnsDefaultStore);
-    this.on("error", ({ detail: msg }) => console.error(msg))
   }
   add(data) {
     let { id } = data;
