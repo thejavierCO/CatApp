@@ -27,7 +27,3 @@
 ### sincronizacion entre ventanas
 
 ![A dos pagina](https://qu.ax/FKC.gif)
-
-### Uso normal
-
-![A una pagina](https://qu.ax/rjCq.gif)
