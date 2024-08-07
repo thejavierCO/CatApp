@@ -10,12 +10,10 @@ export let catImage = async (configApi) => {
 }
 
 export class dbStore extends EventTarget {
-  constructor(fnsUnsuscribe) {
+  constructor(fnsDefaultStore) {
     super();
-    this.store = writable([], fnsUnsuscribe);
-    this.on("error", ({ detail: msg }) => {
-      throw msg
-    })
+    this.store = writable([], fnsDefaultStore);
+    this.on("error", ({ detail: msg }) => console.error(msg))
   }
   add(data) {
     let { id } = data;
@@ -75,24 +73,43 @@ export class dbStore extends EventTarget {
   }
 }
 
+export class localStorageDb {
+  constructor() {
+    this.keys = [];
+    this.storageChange(({ key, newValue }) => {
+      if (key != null) this.keys.forEach(({ key: item, start }) => {
+        if (key == item) start(newValue)
+        else throw "not use key:" + key;
+      });
+      else this.keys.forEach(({ start }) => start(null))
+    })
+  }
+  storageChange(fns) {
+    window.addEventListener("storage", fns);
+  }
+  use(key, start) {
+    if (typeof key !== "string") throw "require key type string"
+    start(localStorage.getItem(key))
+    this.keys.push({ key, start })
+    return this;
+  }
+  get(key) {
+    return { start: (data) => ((this.keys.filter(e => e.key == key))[0].start(data)) };
+  }
+}
+
 export class dbStoreUseLocalStorage extends dbStore {
-  constructor(useLocalStorage) {
-    super();
-    let name = typeof useLocalStorage == "string" ? useLocalStorage : "store";
-    if (localStorage.getItem(name) == null) localStorage.setItem(name, "[]");
-    else this.store.update((_) => JSON.parse(localStorage.getItem(name)));
-    this.Destroy = this.store.subscribe((data) =>
-      JSON.stringify(data) != localStorage.getItem(name)
-        ? localStorage.setItem(name, JSON.stringify(data))
-        : ""
-    );
-    window.addEventListener("storage", ({ key, newValue }) => {
-      if (key == name)
-        this.store.update((db) => {
-          if (JSON.stringify(db) != newValue) return JSON.parse(newValue);
-          else return db;
-        });
-      else if (key == null) this.store.update((_) => []);
-    });
+  constructor(fnsUnsuscribe) {
+    super(fnsUnsuscribe);
+    this.keysStore = new localStorageDb();
+    this.keysStore.use("store", (data) => {
+      if (data == null) this.store.update((_) => {
+        localStorage.setItem("store", "[]")
+        return []
+      })
+      else if (typeof data == "string") return localStorage.setItem("store", data)
+      else throw "require string"
+    })
+    this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start(JSON.stringify(data)))
   }
 }
