@@ -1,3 +1,5 @@
+import { writable } from "svelte/store"
+import { v4 as uuidv4 } from "uuid";
 import { CatApi } from './catApi';
 
 export let catImage = async (configApi) => {
@@ -5,4 +7,92 @@ export let catImage = async (configApi) => {
   let json = await cat.images().search(configApi);
   let [item] = await json;
   return item.url
+}
+
+export class dbStore extends EventTarget {
+  constructor(fnsUnsuscribe) {
+    super();
+    this.store = writable([], fnsUnsuscribe);
+    this.on("error", ({ detail: msg }) => {
+      throw msg
+    })
+  }
+  add(data) {
+    let { id } = data;
+    if (!id) data.id = uuidv4();
+    this.emit("addItem", data);
+    this.store.update((e) => {
+      if (e.filter((e) => e.id == id).length == 0) e.push(data);
+      else this.emit("error", "exist element");
+      return e;
+    });
+    return this;
+  }
+  del(id) {
+    this.emit("delItem", { id });
+    this.store.update((e) => {
+      let item = e.filter((e) => e.id == id);
+      if (item.length == 1) return e.filter((e) => e.id != id);
+      else this.emit("error", "not exist element");
+      return e;
+    });
+    return this;
+  }
+  edit(id, data) {
+    this.store.update((db) => {
+      let [item] = db.filter((e) => e.id == id);
+      if (typeof item != "undefined")
+        return db.map((e) =>
+          e.id == item.id
+            ? ((e) => {
+              Object.keys(data).forEach((k) => {
+                if (e[k] != data[k]) {
+                  this.emit("editItem", {
+                    id,
+                    data: {
+                      newData: data,
+                      oldData: e,
+                    },
+                  });
+                  e[k] = data[k];
+                } else this.emit("error", "element is update");
+              });
+              return e;
+            })(e)
+            : e
+        );
+      else this.emit("error", "not exist element");
+      return db;
+    });
+    return this;
+  }
+  emit(name, data) {
+    if (data) return this.dispatchEvent(new CustomEvent(name, { detail: data }))
+    else return this.dispatchEvent(new Event(name))
+  }
+  on(name, callback) {
+    this.addEventListener(name, callback)
+  }
+}
+
+export class dbStoreUseLocalStorage extends dbStore {
+  constructor(useLocalStorage) {
+    super();
+    let name = typeof useLocalStorage == "string" ? useLocalStorage : "store";
+    if (localStorage.getItem(name) == null) localStorage.setItem(name, "[]");
+    else this.store.update((_) => JSON.parse(localStorage.getItem(name)));
+    this.Destroy = this.store.subscribe((data) =>
+      JSON.stringify(data) != localStorage.getItem(name)
+        ? localStorage.setItem(name, JSON.stringify(data))
+        : ""
+    );
+    window.addEventListener("storage", ({ key, newValue }) => {
+      if (key == name)
+        this.store.update((db) => {
+          if (JSON.stringify(db) != newValue) return JSON.parse(newValue);
+          else return db;
+        });
+      else if (key == null) this.store.update((_) => []);
+    });
+  }
 }

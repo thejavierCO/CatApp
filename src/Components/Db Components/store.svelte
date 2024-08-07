@@ -6,7 +6,9 @@
   export let useLocalStorage = false;
 
   const emit = createEventDispatcher();
-  const store = writable([]);
+  const store = writable([], (_) => () => {
+    console.warn("unsus");
+  });
 
   export function add(data) {
     let { id } = data;
@@ -65,7 +67,12 @@
         : ""
     );
     window.addEventListener("storage", ({ key, newValue }) => {
-      if (key == name) store.update((_) => JSON.parse(newValue));
+      if (key == name)
+        store.update((db) => {
+          if (JSON.stringify(db) != newValue) return JSON.parse(newValue);
+          else return db;
+        });
+      else if (key == null) store.update((_) => []);
     });
     onDestroy(() => unsus());
   }
