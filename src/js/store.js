@@ -81,7 +81,7 @@ export class localStorageDb {
         if (key == item) start(newValue)
         else throw "not use key:" + key;
       });
-      else this.keys.forEach(({ start }) => start(null))
+      else this.keys.forEach(({ start }) => start(undefined))
     })
   }
   storageChange(fns) {
@@ -94,7 +94,9 @@ export class localStorageDb {
     return this;
   }
   get(key) {
-    return { start: (data) => ((this.keys.filter(e => e.key == key))[0].start(data)) };
+    let item = this.keys.filter(e => e.key == key);
+    if (item.length != 1) throw "not exist key in localstore"
+    return { start: (data) => item[0].start(data) };
   }
 }
 
@@ -103,13 +105,11 @@ export class dbStoreUseLocalStorage extends dbStore {
     super(fnsUnsuscribe);
     this.keysStore = new localStorageDb();
     this.keysStore.use("store", (data) => {
-      if (data == null) this.store.update((_) => {
-        localStorage.setItem("store", "[]")
-        return []
-      })
-      else if (typeof data == "string") return localStorage.setItem("store", data)
-      else throw "require string"
+      if (typeof data == "string") this.store.update(_ => JSON.parse(data))
+      else if (typeof data == "undefined") this.store.update(_ => ([]));
+      else if (Array.isArray(data)) localStorage.setItem("store", JSON.stringify(data));
+      else if (data == null) localStorage.setItem("store", "[]")
     })
-    this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start(JSON.stringify(data)))
+    this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start(data))
   }
 }

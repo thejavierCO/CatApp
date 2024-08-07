@@ -7,9 +7,10 @@
 
   const emit = createEventDispatcher();
 
-  let db = new dbStoreUseLocalStorage();
+  let db = new (useLocalStorage ? dbStoreUseLocalStorage : dbStore)();
 
   const store = db.store;
+
   onMount(() =>
     emit("mount", {
       add: (data) => db.add(data),
