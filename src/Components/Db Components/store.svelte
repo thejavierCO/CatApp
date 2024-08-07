@@ -11,6 +11,10 @@
 
   const store = db.store;
 
+  onDestroy(() => {
+    if (useLocalStorage) db.Destroy();
+  });
+
   onMount(() =>
     emit("mount", {
       add: (data) => db.add(data),
