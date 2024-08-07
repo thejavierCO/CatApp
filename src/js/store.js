@@ -75,7 +75,12 @@ export class dbStore extends EventTarget {
 
 export class localStorageDb {
   constructor() {
+    this.id = "";
     this.keys = [];
+    if (this.id == "") {
+      this.id = uuidv4();
+      sessionStorage.setItem("userId", this.id)
+    }
     this.storageChange(({ key, newValue }) => {
       if (key != null) this.keys.forEach(({ key: item, start }) => {
         if (key == item) start(newValue)
