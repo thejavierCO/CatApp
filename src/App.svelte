@@ -34,6 +34,7 @@
       status={data.status}
       time={data.time}
       let:formatTime
+      let:btnStop
       on:state={({ detail: { data } }) => edit(id, data)}
       on:isStop={() => del(id)}
     >
@@ -53,10 +54,17 @@
               <span class="sm:text-sm md:text-2xl text-center text-white">
                 Cat \(♥‿♥)/
               </span>
-              <span class="text-center text-white">Delete in</span>
-              <span class="sm:text-sm md:text-2xl text-center text-white">
-                {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
-              </span>
+              <span class="text-sm text-center text-white">Delete in</span>
+              <button on:click={() => del(id)}>
+                <span
+                  class="sm:text-sm md:text-2xl text-4xl text-center text-white hover:text-red-600"
+                >
+                  {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
+                </span><br />
+                <span class="text-center text-red-600 text-sm"
+                  >click here for new cat (TnT)</span
+                >
+              </button>
             </div>
           </div>
         </Background>
