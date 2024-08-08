@@ -42,7 +42,7 @@
           <div
             in:blur={{ duration: 1000 }}
             out:blur={{ duration: 250 }}
-            class="flex justify-center"
+            class="center_element"
           >
             <div class="rounded-lg shadow-lg bg-black max-w-sm grid">
               <img
@@ -51,7 +51,7 @@
                 alt="cat"
               />
               <span class="sm:text-sm md:text-2xl text-center text-white">
-                #{index + 1} Cat \(♥‿♥)/
+                Cat \(♥‿♥)/
               </span>
               <span class="text-center text-white">Delete in</span>
               <span class="sm:text-sm md:text-2xl text-center text-white">
@@ -64,3 +64,13 @@
     </Counter>
   </div>
 </Store>
+
+<style>
+  .center_element {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
