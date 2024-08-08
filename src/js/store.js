@@ -61,10 +61,10 @@ export class dbStore extends EventTarget {
 export class localStorageDb {
   constructor() {
     this.keys = [];
-    this.storageChange(({ key, newValue }) => {
+    this.storageChange(({ key, newValue, oldValue }) => {
       if (key != null) {
         try {
-          this.get(key).start({ type: "updateStorage", data: newValue });
+          if (oldValue != "[]") this.get(key).start({ type: "updateStorage", data: newValue });
         } catch (e) {
           console.error(e)
         }
@@ -95,6 +95,7 @@ export class dbStoreUseLocalStorage extends dbStore {
       switch (type) {
         case "init":
           if (data == null) localStorage.setItem("store", "[]");
+          else this.store.set(JSON.parse(data))
           break;
         case "updateStorage":
           this.store.set(JSON.parse(data));
