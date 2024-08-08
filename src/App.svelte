@@ -22,6 +22,10 @@
   on:mount={async ({ detail: { add, store } }) => {
     if (store().length === 0) add(await objectAdd());
   }}
+  on:delete={({ detail: { add, store } }) =>
+    setTimeout(async () => {
+      if (store().length === 0 && document.hasFocus()) add(await objectAdd());
+    }, 500)}
 >
   <div slot="print" let:id let:data let:index>
     <Counter

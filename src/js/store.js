@@ -120,7 +120,7 @@ export class dbStoreUseLocalStorage extends dbStore {
       }
     })
     this.Destroy = this.store.subscribe((data) => {
-      if(JSON.stringify(data) != localStorage.getItem("store")){
+      if (JSON.stringify(data) != localStorage.getItem("store")) {
         this.keys.get("store")
           .start({
             type: "updateStore",

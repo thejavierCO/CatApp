@@ -11,6 +11,15 @@
 
   const store = db.store;
 
+  db.on("del", (_) =>
+    emit("delete", {
+      add: (data) => db.add(data),
+      del: (id) => db.del(id),
+      edit: (id, data) => db.edit(id, data),
+      store: () => get(store),
+    })
+  );
+
   onDestroy(() => {
     if (useLocalStorage) db.Destroy();
   });
