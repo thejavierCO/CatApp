@@ -5,6 +5,13 @@
   import Counter from "./Components/Timer Components/timer.svelte";
   import { catImage } from "./js/store";
   export let config;
+  let objectAdd = async () => ({
+    status: "Stop",
+    seconds: 5, //86400,
+    time: { start: 0, end: 0, pause: 0 },
+    img: "#", //await catImage(config),
+    isActiveAutoRun: true,
+  });
 </script>
 
 <Store
@@ -14,14 +21,7 @@
   useLocalStorage
   on:mount={async ({ detail: { add, store } }) => {
     if (store().length === 0) {
-      let url = await catImage(config);
-      add({
-        status: "Stop",
-        seconds: 86400,
-        time: { start: 0, end: 0, pause: 0 },
-        img: url,
-        isActiveAutoRun: true,
-      });
+      add(await objectAdd());
     }
   }}
 >
@@ -35,16 +35,7 @@
       on:state={({ detail: { data } }) => edit(id, data)}
       on:isStop={() => del(id)}
       on:isStop={async () => {
-        let url = await catImage(config);
-        setTimeout(() => {
-          add({
-            status: "Stop",
-            seconds: 86400,
-            time: { start: 0, end: 0, pause: 0 },
-            img: url,
-            isActiveAutoRun: true,
-          });
-        }, 50);
+        setTimeout(async () => add(await objectAdd()), 50);
       }}
     >
       <div>

@@ -75,12 +75,15 @@ export class dbStore extends EventTarget {
 export class localStorageDb {
   constructor() {
     this.keys = [];
-    this.storageChange(({ key, newValue }) => {
-      if (key != null) this.keys.forEach(({ key: item, start }) => {
-        if (key == item) start(newValue)
-        else throw "not use key:" + key;
-      });
-      else this.keys.forEach(({ start }) => start(undefined))
+    this.storageChange(({ key, newValue, oldValue }) => {
+      if (key != null) {
+        try {
+          if (oldValue != "[]") this.get(key).start({ type: "updateStorage", data: newValue });
+          else throw "not created key"
+        } catch (e) {
+          console.error(e)
+        }
+      } else this.keys.forEach(({ start }) => start({ type: "clear", data: null }))
     })
   }
   storageChange(fns) {
@@ -103,11 +106,22 @@ export class dbStoreUseLocalStorage extends dbStore {
   constructor(fnsUnsuscribe) {
     super(fnsUnsuscribe);
     this.keysStore = new localStorageDb();
-    this.keysStore.use("store", (data) => {
-      if (typeof data == "string") this.store.update(_ => JSON.parse(data))
-      else if (typeof data == "undefined") this.store.update(_ => ([]));
-      else if (Array.isArray(data) && document.hasFocus()) localStorage.setItem("store", JSON.stringify(data));
-      else if (data == null) localStorage.setItem("store", "[]")
+    this.keysStore.use("store", ({ type, data }) => {
+      switch (type) {
+        case "init":
+          if (data == null) localStorage.setItem("store", "[]");
+          else this.store.set(JSON.parse(data))
+          break;
+        case "updateStorage":
+          this.store.set(JSON.parse(data))
+          break;
+        case "updateStore":
+          localStorage.setItem("store", data)
+          break;
+        case "clear":
+          this.clear();
+          break;
+      }
     })
     this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start(data))
   }
