@@ -1,29 +1,29 @@
-## cat app
------
+# cat app
 
 ### template usado
 
- [svelte/template](https://github.com/sveltejs/template)
+[svelte/template](https://github.com/sveltejs/template)
 
-### usa
- - localStorage
- - Svelte
- - Tailwind
+### En estre proyecto se uso
 
-### como usar?
+- Svelte
+- Tailwind
 
-#### cupas tener
- - nodejs
- - git
+### Tecnologias usadas
+
+- nodejs
+- git
+
+### clonar repositorio
 
 ```shell
     git clone https://github.com/thejavierCO/CatApp.git
     cd ./CatApp
-    npm i 
+    npm i
 ```
 
-### para inicar el proyecto
+# Ejemplos
 
-```shell
-    npm start
-```
+### sincronizacion entre ventanas
+
+![A dos pagina](https://qu.ax/FKC.gif)

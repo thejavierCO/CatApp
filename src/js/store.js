@@ -8,78 +8,63 @@ export let catImage = async (configApi) => {
   let [item] = await json;
   return item.url
 }
-
 export class dbStore extends EventTarget {
   constructor(fnsDefaultStore) {
     super();
     this.store = writable([], fnsDefaultStore);
+    this.on("Item", ({ detail: { type, data } }) => {
+      this.store.update(e => {
+        this.emit(type, data)
+        switch (type) {
+          case "add": return [...e, data];
+          case "del": return e.filter(e => e.id != data.id);
+          case "edit":
+            return e.map(e => {
+              let { id, data: item } = data;
+              if (e.id == id) Object.keys(item).forEach((k) => (e[k] != item[k]) ? e[k] = item[k] : "");
+              return e;
+            })
+          case "clear": return [];
+          default: return e;
+        }
+      })
+    })
   }
   add(data) {
     let { id } = data;
     if (!id) data.id = uuidv4();
-    this.emit("addItem", data);
-    this.store.update((e) => {
-      if (e.filter((e) => e.id == id).length == 0) e.push(data);
-      else this.emit("error", "exist element");
-      return e;
-    });
+    this.emit("Item", { type: "add", data });
     return this;
   }
   del(id) {
-    this.emit("delItem", { id });
-    this.store.update((e) => {
-      let item = e.filter((e) => e.id == id);
-      if (item.length == 1) return e.filter((e) => e.id != id);
-      else this.emit("error", "not exist element");
-      return e;
-    });
+    this.emit("Item", { type: "del", data: { id } });
     return this;
   }
   edit(id, data) {
-    this.store.update((db) => {
-      let [item] = db.filter((e) => e.id == id);
-      if (typeof item != "undefined")
-        return db.map((e) =>
-          e.id == item.id
-            ? ((e) => {
-              Object.keys(data).forEach((k) => {
-                if (e[k] != data[k]) {
-                  this.emit("editItem", {
-                    id,
-                    data: {
-                      newData: data,
-                      oldData: e,
-                    },
-                  });
-                  e[k] = data[k];
-                } else this.emit("error", "element is update");
-              });
-              return e;
-            })(e)
-            : e
-        );
-      else this.emit("error", "not exist element");
-      return db;
-    });
+    this.emit("Item", { type: "edit", data: { id, data } });
+    return this;
+  }
+  clear() {
+    this.emit("Item", { type: "clear", data: null });
     return this;
   }
   emit(name, data) {
-    if (data) return this.dispatchEvent(new CustomEvent(name, { detail: data }))
-    else return this.dispatchEvent(new Event(name))
+    if (data) return this.dispatchEvent(new CustomEvent(name, { detail: data, cancelable: true }))
+    else return this.dispatchEvent(new Event(name, { cancelable: true }))
   }
   on(name, callback) {
-    this.addEventListener(name, callback)
+    this.addEventListener(name, callback);
+    return this;
   }
 }
 
 export class localStorageDb {
   constructor() {
     this.keys = [];
-    this.storageChange(({ key, newValue, oldValue }) => {
+    this.storageChange(({ key, newValue }) => {
       if (key != null) {
         try {
-          if (oldValue != "[]") this.get(key).start({ type: "updateStorage", data: newValue });
-          else throw "not created key"
+          this.get(key).start({ type: "updateStorage", data: newValue });
         } catch (e) {
           console.error(e)
         }
@@ -91,7 +76,7 @@ export class localStorageDb {
   }
   use(key, start) {
     if (typeof key !== "string") throw "require key type string"
-    start(localStorage.getItem(key))
+    start({ type: "init", data: localStorage.getItem(key) })
     this.keys.push({ key, start })
     return this;
   }
@@ -110,19 +95,18 @@ export class dbStoreUseLocalStorage extends dbStore {
       switch (type) {
         case "init":
           if (data == null) localStorage.setItem("store", "[]");
-          else this.store.set(JSON.parse(data))
           break;
         case "updateStorage":
-          this.store.set(JSON.parse(data))
+          this.store.set(JSON.parse(data));
           break;
         case "updateStore":
-          localStorage.setItem("store", data)
+          localStorage.setItem("store", data);
           break;
         case "clear":
           this.clear();
           break;
       }
     })
-    this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start(data))
+    this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start({ type: "updateStore", data: JSON.stringify(data) }))
   }
 }
