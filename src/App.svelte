@@ -4,7 +4,7 @@
   import Store from "./Components/Db Components/store.svelte";
   import Counter from "./Components/Timer Components/timer.svelte";
   import { catImage } from "./js/store";
-  export let config;
+  // export let config;
   let objectAdd = async () => ({
     status: "Stop",
     seconds: 5, //86400,
@@ -20,9 +20,7 @@
   let:del
   useLocalStorage
   on:mount={async ({ detail: { add, store } }) => {
-    if (store().length === 0) {
-      add(await objectAdd());
-    }
+    if (store().length === 0) add(await objectAdd());
   }}
 >
   <div slot="print" let:id let:data let:index>
@@ -34,9 +32,6 @@
       let:formatTime
       on:state={({ detail: { data } }) => edit(id, data)}
       on:isStop={() => del(id)}
-      on:isStop={async () => {
-        setTimeout(async () => add(await objectAdd()), 50);
-      }}
     >
       <div>
         <Background imageUrl={data.img} let:img>

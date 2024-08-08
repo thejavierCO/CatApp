@@ -1,4 +1,4 @@
-import { writable } from "svelte/store"
+import { writable, get as getStoreData } from "svelte/store"
 import { v4 as uuidv4 } from "uuid";
 import { CatApi } from './catApi';
 
@@ -25,10 +25,16 @@ export class dbStore extends EventTarget {
               return e;
             })
           case "clear": return [];
+          case "insert":
+            if (Array.isArray(data)) return data;
+            else throw "require array for insert data"
           default: return e;
         }
       })
     })
+  }
+  get() {
+    return getStoreData(this.store)
   }
   add(data) {
     let { id } = data;
@@ -46,6 +52,10 @@ export class dbStore extends EventTarget {
   }
   clear() {
     this.emit("Item", { type: "clear", data: null });
+    return this;
+  }
+  insert(data) {
+    this.emit("Item", { type: "insert", data });
     return this;
   }
   emit(name, data) {
@@ -77,37 +87,46 @@ export class localStorageDb {
   use(key, start) {
     if (typeof key !== "string") throw "require key type string"
     start({ type: "init", data: localStorage.getItem(key) })
-    this.keys.push({ key, start })
+    this.keys = [...this.keys, { key, start }]
     return this;
   }
   get(key) {
-    let item = this.keys.filter(e => e.key == key);
-    if (item.length != 1) throw "not exist key in localstore"
-    return { start: (data) => item[0].start(data) };
+    let item = this.keys.find(e => e.key == key);
+    if (item) return item
+    else throw "not exist elemment"
   }
 }
 
 export class dbStoreUseLocalStorage extends dbStore {
   constructor(fnsUnsuscribe) {
     super(fnsUnsuscribe);
-    this.keysStore = new localStorageDb();
-    this.keysStore.use("store", ({ type, data }) => {
+    this.keys = new localStorageDb();
+    this.keys.use("store", ({ type, data }) => {
+      let set = (data) => localStorage.setItem("store", data);
       switch (type) {
         case "init":
-          if (data == null) localStorage.setItem("store", "[]");
-          else this.store.set(JSON.parse(data))
+          if (data == null) set("[]");
+          else this.insert(JSON.parse(data))
           break;
         case "updateStorage":
-          this.store.set(JSON.parse(data));
+          this.insert(JSON.parse(data))
           break;
         case "updateStore":
-          localStorage.setItem("store", data);
+          set(data);
           break;
         case "clear":
           this.clear();
           break;
       }
     })
-    this.Destroy = this.store.subscribe((data) => this.keysStore.get("store").start({ type: "updateStore", data: JSON.stringify(data) }))
+    this.Destroy = this.store.subscribe((data) => {
+      if(JSON.stringify(data) != localStorage.getItem("store")){
+        this.keys.get("store")
+          .start({
+            type: "updateStore",
+            data: JSON.stringify(data)
+          })
+      }
+    })
   }
 }
