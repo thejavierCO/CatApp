@@ -99,14 +99,17 @@ export class localStorageDb {
 
 export class dbStoreUseLocalStorage extends dbStore {
   constructor(fnsUnsuscribe) {
-    super(fnsUnsuscribe);
+    super((set)=>{
+      if(localStorage.getItem("store")==null)localStorage.setItem("store","[]");
+      else set(JSON.parse(localStorage.getItem("store")))
+      if(fnsUnsuscribe)return fnsUnsuscribe()
+    });
     this.keys = new localStorageDb();
     this.keys.use("store", ({ type, data }) => {
       let set = (data) => localStorage.setItem("store", data);
       switch (type) {
         case "init":
-          if (data == null) set("[]");
-          else this.insert(JSON.parse(data))
+          console.log("init")
           break;
         case "updateStorage":
           this.insert(JSON.parse(data))

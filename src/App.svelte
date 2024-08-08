@@ -3,13 +3,13 @@
   import Background from "./Components/background.svelte";
   import Store from "./Components/Db Components/store.svelte";
   import Counter from "./Components/Timer Components/timer.svelte";
-  import { catImage } from "./js/store";
-  export let config;
+  // import { catImage } from "./js/store";
+  // export let config;
   let objectAdd = async () => ({
     status: "Stop",
     seconds: 86400,
     time: { start: 0, end: 0, pause: 0 },
-    img: await catImage(config),
+    img: "#",//await catImage(config),
     isActiveAutoRun: true,
   });
 </script>
