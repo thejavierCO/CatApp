@@ -1,13 +1,6 @@
 import { writable, get as getStoreData } from "svelte/store"
 import { v4 as uuidv4 } from "uuid";
-import { CatApi } from './catApi';
 
-export let catImage = async (configApi) => {
-  let cat = new CatApi("60213ae1-2505-46e8-8843-e72cc3b30468");
-  let json = await cat.images().search(configApi);
-  let [item] = await json;
-  return item.url
-}
 export class dbStore extends EventTarget {
   constructor(fnsDefaultStore) {
     super();
@@ -68,21 +61,19 @@ export class dbStore extends EventTarget {
   }
 }
 
-export class localStorageDb {
+export class localStorageDb extends EventTarget{
   constructor() {
+    super();
     this.keys = [];
-    this.storageChange(({ key, newValue, oldValue }) => {
-      if (key != null) {
-        try {
-          if (oldValue != "[]") this.get(key).start({ type: "updateStorage", data: newValue });
-        } catch (e) {
-          console.error(e)
-        }
-      } else this.keys.forEach(({ start }) => start({ type: "clear", data: null }))
+    if(window)window.addEventListener("storage",(e)=>this.emit("storageChange",e))
+    this.on("storageChange",({detail:{ key, newValue, oldValue }}) => {
+      try{
+        if (key != null) this.get(key).start({ type: "updateStorage", data: newValue });
+        else this.keys.forEach(({ start }) => start({ type: "clear", data: null }))
+      }catch(err){
+        console.error(e);
+      }
     })
-  }
-  storageChange(fns) {
-    window.addEventListener("storage", fns);
   }
   use(key, start) {
     if (typeof key !== "string") throw "require key type string"
@@ -95,41 +86,49 @@ export class localStorageDb {
     if (item) return item
     else throw "not exist elemment"
   }
+  emit(name, data) {
+    if (data) return this.dispatchEvent(new CustomEvent(name, { detail: data, cancelable: true }))
+    else return this.dispatchEvent(new Event(name, { cancelable: true }))
+  }
+  on(name, callback) {
+    this.addEventListener(name, callback);
+    return this;
+  }
 }
 
 export class dbStoreUseLocalStorage extends dbStore {
   constructor(fnsUnsuscribe) {
-    super((set)=>{
-      if(localStorage.getItem("store")==null)localStorage.setItem("store","[]");
-      else set(JSON.parse(localStorage.getItem("store")))
-      if(fnsUnsuscribe)return fnsUnsuscribe()
+    super((setInternalStore)=>{
+      this.localStorageKeys = new localStorageDb();
+      this.localStorageKeys.use("store", ({ type, data }) => {
+        let setLocalStore = (data) => localStorage.setItem("store", data);
+        let getLocalStore = () => localStorage.getItem("store");
+        switch (type) {
+          case "init":
+            if(getLocalStore()==null)setLocalStore("[]");
+            else setInternalStore(JSON.parse(getLocalStore()));
+            break;
+          case "updateStorage":
+            setInternalStore(JSON.parse(data))
+            break;
+          case "updateStore":
+            setLocalStore(data);
+            break;
+          case "clear":
+            setInternalStore([])
+            break;
+        }
+      })
+      this.Destroy = this.store.subscribe((data) => {
+        if (JSON.stringify(data) != localStorage.getItem("store")) {
+          this.localStorageKeys.get("store")
+            .start({
+              type: "updateStore",
+              data: JSON.stringify(data)
+            })
+        }
+      })
+      return fnsUnsuscribe
     });
-    this.keys = new localStorageDb();
-    this.keys.use("store", ({ type, data }) => {
-      let set = (data) => localStorage.setItem("store", data);
-      switch (type) {
-        case "init":
-          console.log("init")
-          break;
-        case "updateStorage":
-          this.insert(JSON.parse(data))
-          break;
-        case "updateStore":
-          set(data);
-          break;
-        case "clear":
-          this.clear();
-          break;
-      }
-    })
-    this.Destroy = this.store.subscribe((data) => {
-      if (JSON.stringify(data) != localStorage.getItem("store")) {
-        this.keys.get("store")
-          .start({
-            type: "updateStore",
-            data: JSON.stringify(data)
-          })
-      }
-    })
   }
 }
