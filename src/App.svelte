@@ -15,7 +15,6 @@
 </script>
 
 <Store
-  let:add
   let:edit
   let:del
   useLocalStorage
