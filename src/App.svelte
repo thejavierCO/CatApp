@@ -9,7 +9,7 @@
     status: "Stop",
     seconds: 86400,
     time: { start: 0, end: 0, pause: 0 },
-    img: "#",//await catImage(config),
+    img: "https://c.tenor.com/RVvnVPK-6dcAAAAM/reload-cat.gif", //await catImage(config),
     isActiveAutoRun: true,
   });
 </script>
