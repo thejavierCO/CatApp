@@ -1,5 +1,4 @@
 import { writable, get as getStoreData } from "svelte/store";
-import { localStorageDb } from "./localStorage";
 import { v4 as uuidv4 } from "uuid";
 
 class StoreItem {
@@ -73,25 +72,5 @@ export class Store extends EventTarget {
   on(name, callback) {
     this.addEventListener(name, callback);
     return this;
-  }
-}
-
-export class StoreUseLocalStorage extends Store {
-  constructor(fnsUnsuscribe) {
-    super((setInternalStore) => {
-      console.log("start")
-      this.Keys = new localStorageDb();
-      const store = this.Keys.add("store").defaultData("[]")
-      setInternalStore(store.toJSON());
-      store.onChange(({ newValue: data }) => {
-        if (!document.hasFocus()) setInternalStore(store.toJSON(data))
-      })
-      this.Keys.on("ClearStorage", (_) => setInternalStore([]))
-      return fnsUnsuscribe;
-    });
-    this.Destroy = this.subscribe((data) => {
-      const store = this.Keys.get("store");
-      store.data = store.toString(data);
-    })
   }
 }
