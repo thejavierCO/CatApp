@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher, onMount, onDestroy } from "svelte";
-  import { Temporizador } from "../../js/data";
+  import { Temporizador } from "./data";
   let emit = createEventDispatcher();
 
   export let time = { start: 0, pause: 0, end: 0 };
@@ -18,8 +18,9 @@
       if (detail.status == "Play") emit("isPlay");
       if (detail.status == "Pause") emit("isPause");
       status = detail.status;
+      time = detail.time;
     }
-    if (status == "Play") posicion = Counter.formatTime;
+    posicion = Counter.formatTime;
   });
 
   onMount(() => {

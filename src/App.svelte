@@ -1,10 +1,10 @@
 <script>
   import { blur } from "svelte/transition";
-  import Background from "./Components/background.svelte";
+  import Background from "./Components/Style Components/background.svelte";
   import Store from "./Components/Db Components/store.svelte";
   import Counter from "./Components/Timer Components/timer.svelte";
-  // import { catImage } from "./js/store";
-  // export let config;
+  import { catImage } from "./js/catApi.js";
+  export let config;
   let objectAdd = async () => ({
     status: "Stop",
     seconds: 86400,
