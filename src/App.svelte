@@ -55,7 +55,7 @@
                 Cat \(♥‿♥)/
               </span>
               <span class="text-sm text-center text-white">Delete in</span>
-              <button on:click={() => del(id)}>
+              <button on:click={() => btnStop()}>
                 <span
                   class="sm:text-sm md:text-2xl text-4xl text-center text-white hover:text-red-600"
                 >
