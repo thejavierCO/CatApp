@@ -34,8 +34,7 @@
       time={data.time}
       let:formatTime
       let:btnStop
-      on:state={({ detail: { data } }) => edit(id, data)}
-      on:isStop={() => del(id)}
+      on:Status={({ detail }) => edit(id, detail)}
     >
       <div>
         <Background imageUrl={data.img} let:img>
@@ -54,7 +53,11 @@
                 Cat \(♥‿♥)/
               </span>
               <span class="text-sm text-center text-white">Delete in</span>
-              <button on:click={() => btnStop()}>
+              <button
+                on:click={() => {
+                  del(id);
+                }}
+              >
                 <span
                   class="sm:text-sm md:text-2xl text-4xl text-center text-white hover:text-red-600"
                 >

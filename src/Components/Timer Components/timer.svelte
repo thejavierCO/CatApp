@@ -1,6 +1,11 @@
 <script>
-  import { createEventDispatcher, onMount, onDestroy } from "svelte";
-  import { Temporizador } from "./data";
+  import {
+    createEventDispatcher,
+    onMount,
+    onDestroy,
+    beforeUpdate,
+  } from "svelte";
+  import Timer from "./timer.js";
   let emit = createEventDispatcher();
 
   export let time = { start: 0, pause: 0, end: 0 };
@@ -8,35 +13,34 @@
   export let seconds = 1;
   export let autoRun = false;
 
-  let Counter = new Temporizador(seconds * 1000, time, status);
+  let timer = new Timer(seconds * 1000, status, time);
+  let position = timer.formatTime(0);
 
-  let posicion = Counter.formatTime;
-  Counter.on("current_status_timer", ({ detail }) => {
-    if (status != detail.status) {
-      emit("state", { data: detail });
-      if (detail.status == "Stop") emit("isStop");
-      if (detail.status == "Play") emit("isPlay");
-      if (detail.status == "Pause") emit("isPause");
-      status = detail.status;
-      time = detail.time;
-    }
-    posicion = Counter.formatTime;
+  timer.on("clock", ({ detail: t }) => (position = timer.formatTime(t)));
+  timer.on("Status", ({ target }) => {
+    status = target.status;
+    emit("Status", { status, time });
   });
 
   onMount(() => {
     if (autoRun) {
-      if (status != "Play") return Counter.play();
-      if (status == "Stop") return Counter.stop();
+      setTimeout(() => timer.Play(), 10);
     }
   });
-
-  onDestroy(() => Counter.Destroy());
+  beforeUpdate(() => {
+    timer.updateTime(time);
+    timer.updateStatus(status);
+    timer.updateMiliseconds(seconds * 1000);
+  });
+  onDestroy(() => {
+    timer.Destroy();
+  });
 </script>
 
 <slot
-  btnPause={() => Counter.pause()}
-  btnStop={() => Counter.stop()}
-  btnPlay={() => Counter.play()}
+  btnPlay={() => timer.Play()}
+  btnStop={() => timer.Stop()}
+  btnPause={() => timer.Pause()}
   {status}
-  formatTime={posicion}
+  formatTime={position}
 />
