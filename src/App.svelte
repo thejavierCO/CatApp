@@ -2,7 +2,7 @@
   import { blur } from "svelte/transition";
   import Background from "./Components/Style Components/background.svelte";
   import Store from "./Components/Db Components/store.svelte";
-  import Counter from "./Components/Timer Components/timer.svelte";
+  import Counter from "./Components/Timer Components/timer_inde.svelte";
   import { catImage } from "./js/catApi.js";
   export let config;
   let objectAdd = async () => ({
@@ -61,7 +61,8 @@
                 <span
                   class="sm:text-sm md:text-2xl text-4xl text-center text-white hover:text-red-600"
                 >
-                  {formatTime.Hours}:{formatTime.Minutes}:{formatTime.Seconds}
+                  {formatTime().Hours}:{formatTime().Minutes}:{formatTime()
+                    .Seconds}
                 </span><br />
                 <span class="text-center text-red-600 text-sm"
                   >click here for new cat (TnT)</span
